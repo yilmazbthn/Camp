@@ -1,0 +1,43 @@
+@model TodoMVC.Models.RegisterViewModel
+
+<form asp-action="Register" method="post" style="max-width: 400px; margin: 0 auto;" autocomplete="off">
+
+    @* Genel ModelState hatalarını göster *@
+    @if (ViewData.ModelState.ErrorCount > 0)
+    {
+        <div class="alert alert-danger">
+            @foreach (var error in ViewData.ModelState.Values.SelectMany(v => v.Errors))
+            {
+                <p>@error.ErrorMessage</p>
+            }
+        </div>
+    }
+
+    <div class="mb-3 text-start">
+        <label asp-for="Email" class="form-label">Email</label>
+        <input asp-for="Email" class="form-control" autocomplete="new-email"/>
+        <span asp-validation-for="Email" class="text-danger"></span>
+    </div>
+    
+    <div class="mb-3 text-start">
+        <label asp-for="Password" class="form-label">Şifre</label>
+        <input asp-for="Password" type="password" class="form-control" autocomplete="new-password"/>
+        <span asp-validation-for="Password" class="text-danger"></span>
+    </div>
+    
+    <div class="mb-3 text-start">
+        <label asp-for="ConfirmPassword" class="form-label">Şifreyi Doğrulayın</label>
+        <input asp-for="ConfirmPassword" type="password" class="form-control" autocomplete="new-password" />
+        <span asp-validation-for="ConfirmPassword"  class="text-danger"></span>
+    </div>
+
+    <input type="hidden" id="RecaptchaToken" name="RecaptchaToken" />
+    
+    <div class="d-flex justify-content-center gap-2">
+        <button type="submit" class="btn btn-primary">Kayıt Ol</button>
+        <a asp-controller="Account" asp-action="Login" class="btn btn-success">Giriş Yap</a>
+    </div>
+</form>
+
+
+
