@@ -1,4 +1,4 @@
-namespace TodoMVC;
+namespace KampMVC;
 
 public class SmtpSettings
 {

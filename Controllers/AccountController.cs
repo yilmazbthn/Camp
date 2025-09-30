@@ -2,8 +2,8 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Identity.UI.Services;
 using Microsoft.AspNetCore.Mvc;
-using TodoMVC.Data;
-using TodoMVC.Models;
+using KampMVC.Data;
+using KampMVC.Models;
 
 namespace KampMVC.Controllers;
 
@@ -46,7 +46,7 @@ public class AccountController(
             if (!string.IsNullOrEmpty(returnUrl) && Url.IsLocalUrl(returnUrl))
                 return LocalRedirect(returnUrl);
 
-            return RedirectToAction("Index", "home");
+            return RedirectToAction("Portal", "Portal");
         }
 
         ModelState.AddModelError("", "Geçersiz kullanıcı adı veya parola.");

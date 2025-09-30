@@ -1,0 +1,58 @@
+@model KampMVC.Models.ConversationDetailViewModel
+@{
+    ViewData["Title"] = Model.Subject;
+    Layout = "~/Views/Shared/_PortalLayout.cshtml"; 
+}
+
+<div class="container mt-4">
+    <a href="/messages" class="text-primary mb-3 d-inline-block"><i class="fas fa-arrow-left me-2"></i> Mesaj Kutusuna Geri Dön</a>
+    
+    <h2>@Model.Subject</h2>
+    <hr />
+
+    <div class="message-feed mb-4" style="max-height: 60vh; overflow-y: auto; padding-right: 15px;">
+        @foreach (var message in Model.Messages)
+        {
+            // Kullanıcı kimlik kontrolü (Geçerli kullanıcı ise sağa hizala)
+            var isSender = message.Sender.UserId == User.FindFirst(System.Security.Claims.ClaimTypes.NameIdentifier)?.Value;
+            var alignment = isSender ? "justify-content-end" : "justify-content-start";
+            var bubbleColor = isSender ? "bg-primary text-white" : "bg-light text-dark border";
+
+            <div class="d-flex @alignment mb-3">
+                @if (!isSender)
+                {
+                    <img src="@message.Sender.AvatarUrl" class="rounded-circle me-3" style="width: 40px; height: 40px; object-fit: cover;">
+                }
+                
+                <div class="message-bubble @bubbleColor rounded p-3 shadow-sm" style="max-width: 70%;">
+                    <div class="fw-bold mb-1 small @(isSender ? "text-white-50" : "text-muted")">
+                        @message.Sender.DisplayName
+                    </div>
+                    <div>@message.Content</div>
+                    <small class="d-block mt-1 text-end @(isSender ? "text-white-50" : "text-muted")" style="font-size: 0.75rem;">
+                        @message.TimeAgo
+                    </small>
+                </div>
+                
+                @if (isSender)
+                {
+                    <img src="@message.Sender.AvatarUrl" class="rounded-circle ms-3" style="width: 40px; height: 40px; object-fit: cover;">
+                }
+            </div>
+        }
+    </div>
+
+    <div class="card p-3 shadow-sm">
+        <h5>Cevap Yaz</h5>
+        
+        <form asp-controller="Message" asp-action="Compose" method="post">
+            @* Bu formu sadece var olan bir konuşmaya cevap yazmak için kullanıyoruz. *@
+            @* Modelden Konu ve Alıcıları gizli alanlarla gönderiyoruz *@
+            @Html.Hidden("ConversationId", Model.ConversationId)
+            @Html.Hidden("Subject", Model.Subject) 
+            
+            <textarea name="Content" class="form-control mb-3" rows="3" placeholder="Yanıtınızı buraya yazın..." required></textarea>
+            <button type="submit" class="btn btn-primary"><i class="fas fa-reply me-2"></i> Yanıt Gönder</button>
+        </form>
+    </div>
+</div>

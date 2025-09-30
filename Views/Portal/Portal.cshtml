@@ -1,0 +1,117 @@
+@model KampMVC.Models.ActivityFeedViewModel
+@* Model adınızı projenizin namespace'ine göre düzenlediğinizden emin olun *@
+
+@{
+    ViewData["Title"] = "Ana Aktivite Akışı";
+    // Daha önce hazırlanan ana layout'u kullanıyoruz
+    Layout = "~/Views/Shared/_PortalLayout.cshtml"; 
+}
+
+<div class="container-fluid">
+    <div class="row">
+
+        <div class="col-lg-3 d-none d-lg-block"> 
+            <div class="card mb-4 border-0 shadow-sm">
+                <div class="card-header bg-white fw-bold">Blog Yazıları</div>
+                <ul class="list-group list-group-flush small">
+                    @foreach (var post in Model.BlogPosts)
+                    {
+                        <li class="list-group-item">
+                            <a href="#" class="text-dark text-decoration-none">@post.Title</a>
+                            <small class="d-block text-muted">@post.Date.ToString("MMM d, yyyy")</small>
+                        </li>
+                    }
+                </ul>
+            </div>
+            </div>
+        
+        <div class="col-lg-6">
+            
+            <div class="card mb-4 shadow-sm border-0">
+                <div class="card-body">
+                    <textarea class="form-control mb-2 border-0" rows="3" placeholder="Neler oluyor, @Model.CurrentUser.DisplayName..."></textarea>
+                    <div class="d-flex justify-content-between align-items-center pt-2 border-top">
+                        <div>
+                            <button class="btn btn-sm text-primary me-2"><i class="fas fa-camera"></i></button>
+                            <button class="btn btn-sm text-success me-2"><i class="fas fa-file-alt"></i></button>
+                            </div>
+                        <button class="btn btn-primary btn-sm rounded-pill px-3">Paylaş</button>
+                    </div>
+                </div>
+            </div>
+
+            @foreach (var post in Model.ActivityPosts)
+            {
+                <div class="card mb-4 activity-post shadow-sm border-0">
+                    <div class="card-body">
+                        <div class="d-flex align-items-center mb-3">
+                            <img src="@post.Author.AvatarUrl" class="rounded-circle me-3" style="width: 50px; height: 50px;">
+                            <div>
+                                <h6 class="mb-0">
+                                    <a href="/profile/@post.Author.Username" class="text-decoration-none fw-bold">@post.Author.DisplayName</a>
+                                </h6>
+                                <small class="text-muted">@post.TimeAgo</small> 
+                            </div>
+                        </div>
+
+                        <p>@post.Content</p>
+                        
+                        <div class="d-flex justify-content-start border-top pt-2">
+                            <a href="#" class="text-muted me-3 text-decoration-none"><i class="far fa-thumbs-up me-1"></i> Beğen (@post.LikeCount)</a>
+                            <a href="#" class="text-muted me-3 text-decoration-none"><i class="far fa-comment me-1"></i> Yorum (@post.CommentCount)</a>
+                        </div>
+                        
+                        <div class="comments-section mt-3 border-top pt-3">
+                            @if (post.Comments != null && post.Comments.Any())
+                            {
+                                <p class="small text-muted mb-1">Son Yorumlar:</p>
+                                @foreach (var comment in post.Comments)
+                                {
+                                    <div class="d-flex mb-2 small">
+                                        <span class="fw-bold me-1">@comment.Author.DisplayName:</span> @comment.Content
+                                    </div>
+                                }
+                            }
+                        </div>
+                    </div>
+                </div>
+            }
+
+        </div>
+
+        <div class="col-lg-3">
+            
+            <div class="card mb-4 p-3 border-0 shadow-sm text-center">
+                <div class="card-body">
+                    <h5 class="card-title text-muted mb-3">Profilini Tamamla</h5>
+                    <p class="h1 fw-bold text-primary mb-3">@Model.ProfileCompletionPercentage%</p>
+                    <div class="progress mb-3" style="height: 8px;">
+                        <div class="progress-bar" role="progressbar" 
+                             style="width: @Model.ProfileCompletionPercentage%;" 
+                             aria-valuenow="@Model.ProfileCompletionPercentage" 
+                             aria-valuemin="0" aria-valuemax="100">
+                        </div>
+                    </div>
+                    <a href="/profile/edit" class="btn btn-sm btn-outline-primary mt-2">Profili Düzenle</a>
+                </div>
+            </div>
+
+            <div class="card border-0 shadow-sm">
+                <div class="card-header bg-white fw-bold">Son Güncellemeler</div>
+                <ul class="list-group list-group-flush small">
+                    @foreach (var update in Model.LatestUpdates)
+                    {
+                        <li class="list-group-item d-flex align-items-center">
+                            <img src="@update.Author.AvatarUrl" class="rounded-circle me-2" style="width: 30px; height: 30px;">
+                            <a href="/post/@update.PostId" class="text-dark text-decoration-none">
+                                <span class="fw-bold">@update.Author.DisplayName</span> güncelledi.
+                            </a>
+                        </li>
+                    }
+                </ul>
+            </div>
+            
+        </div>
+        
+    </div>
+</div>

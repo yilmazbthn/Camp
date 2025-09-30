@@ -1,0 +1,59 @@
+@model KampMVC.Models.MessageListViewModel
+@{
+    ViewData["Title"] = "Mesaj Kutusu";
+    // Eğer Portal'ın ana layout'unu kullanıyorsanız
+    Layout = "~/Views/Shared/_PortalLayout.cshtml"; 
+}
+
+<div class="container mt-4">
+    <div class="d-flex justify-content-between align-items-center mb-3">
+        <h2><i class="fas fa-envelope me-2 text-primary"></i> Mesaj Kutusu</h2>
+        <a href="/messages/compose" class="btn btn-success">
+            <i class="fas fa-plus me-1"></i> Yeni Mesaj
+        </a>
+    </div>
+
+    @if (Model.Conversations != null && Model.Conversations.Any())
+    {
+        <div class="list-group shadow-sm">
+            @foreach (var convo in Model.Conversations)
+            {
+                // Okunmamış mesaj varsa listeyi kalın (fw-bold) yap
+                var listClass = convo.UnreadCount > 0 ? "list-group-item-action list-group-item-info fw-bold" : "list-group-item-action";
+                
+                // Hata almamak için OtherParticipant kontrolü
+                var participantName = convo.OtherParticipant?.DisplayName ?? "Kullanıcı Yok";
+                var participantAvatar = convo.OtherParticipant?.AvatarUrl ?? "/img/default.jpg";
+
+
+                <a href="/messages/c/@convo.ConversationId" class="list-group-item d-flex align-items-center @listClass">
+                    
+                    <img src="@participantAvatar" class="rounded-circle me-3" style="width: 50px; height: 50px; object-fit: cover;">
+                    
+                    <div class="flex-grow-1">
+                        <div class="d-flex justify-content-between">
+                            <h6 class="mb-0 text-dark">@convo.Subject</h6>
+                            <small class="text-muted">@convo.TimeAgo</small>
+                        </div>
+                        
+                        <small class="text-muted d-block text-truncate" style="max-width: 90%;">
+                            <span class="text-dark fw-bold me-1">@participantName:</span>
+                            @convo.LastMessageContent
+                        </small>
+                    </div>
+
+                    @if (convo.UnreadCount > 0)
+                    {
+                        <span class="badge bg-danger rounded-pill ms-3">@convo.UnreadCount</span>
+                    }
+                </a>
+            }
+        </div>
+    }
+    else
+    {
+        <div class="alert alert-info text-center">
+            Henüz hiç mesajınız yok. Yeni bir konuşma başlatın!
+        </div>
+    }
+</div>

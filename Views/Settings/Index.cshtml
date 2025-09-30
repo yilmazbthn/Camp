@@ -1,0 +1,170 @@
+@model object
+@* Model tipi esnektir, çünkü POST sonrası Controller'dan farklı tipler (General, Password, vb.) gelebilir. *@
+@{
+    // Varsayım: Layout dosya yolunuzu düzeltiyorum. Eğer farklıysa kendi yolunuzu kullanın.
+    ViewData["Title"] = "Hesap Ayarları";
+    Layout = "~/Views/Shared/_PortalLayout.cshtml"; 
+    string activeTab = ViewData["ActiveTab"]?.ToString() ?? "general";
+
+    // Modelleri dinamik olarak belirle ve varsayılan olarak boş nesneler oluştur:
+    GeneralSettingsViewModel generalModel = new GeneralSettingsViewModel();
+    ChangePasswordViewModel passwordModel = new ChangePasswordViewModel();
+    EmailSettingsViewModel emailModel = new EmailSettingsViewModel(); // Email modelini de kullanacağız
+    
+    // 2. Eğer POST sonrası hata ile dönüldüyse, ilgili modeli kullan
+    if (Model is ChangePasswordViewModel)
+    {
+        passwordModel = (ChangePasswordViewModel)Model;
+        activeTab = "password"; 
+    }
+    // GeneralSettingsViewModel, hem genel sekmesinde hem de (basitleştirme amaçlı) e-posta sekmesinde kullanılır.
+    else if (Model is GeneralSettingsViewModel)
+    {
+         generalModel = (GeneralSettingsViewModel)Model;
+         // activeTab zaten Controller tarafından set edilmiştir (general veya email)
+    }
+    // NOT: İlk GET isteğinde, Controller GeneralSettingsViewModel'i gönderir, bu da buraya düşer.
+}
+
+<div class="container mt-4">
+    <h2><i class="fas fa-cog text-primary me-2"></i> Hesap Ayarları</h2>
+    <hr />
+
+    <div class="row">
+
+        <div class="col-md-3">
+            @* ... (Kod aynı kalıyor) ... *@
+            <div class="list-group mb-4 shadow-sm">
+                <a href="#general" class="list-group-item list-group-item-action @(activeTab == "general" ? "active" : "")" data-bs-toggle="tab" data-tab-name="general">
+                    <i class="fas fa-user-circle me-2"></i> Genel
+                </a>
+                <a href="#password" class="list-group-item list-group-item-action @(activeTab == "password" ? "active" : "")" data-bs-toggle="tab" data-tab-name="password">
+                    <i class="fas fa-lock me-2"></i> Parola Değiştir
+                </a>
+                <a href="#email" class="list-group-item list-group-item-action @(activeTab == "email" ? "active" : "")" data-bs-toggle="tab" data-tab-name="email">
+                    <i class="fas fa-envelope me-2"></i> E-posta & Bildirimler
+                </a>
+                <a href="/profile" class="list-group-item list-group-item-action text-danger">
+                    <i class="fas fa-arrow-left me-2"></i> Profile Geri Dön
+                </a>
+            </div>
+        </div>
+
+        <div class="col-md-9">
+
+            @* Mesajlar (Aynı kalıyor) *@
+            @if (TempData["SuccessMessage"] != null)
+            {
+                <div class="alert alert-success">@TempData["SuccessMessage"]</div>
+            }
+            @if (TempData["InfoMessage"] != null)
+            {
+                <div class="alert alert-info">@TempData["InfoMessage"]</div>
+            }
+
+            <div class="tab-content border bg-white p-4 shadow-sm rounded-3">
+
+                <div class="tab-pane fade @(activeTab == "general" ? "show active" : "")" id="general">
+                    <h4>Genel Bilgiler</h4>
+                    <hr />
+                    <form asp-controller="Settings" asp-action="UpdateGeneral" method="post">
+                        @* ModelOnly, sadece Identity hatalarını gösterir. *@
+                        <div asp-validation-summary="ModelOnly" class="alert alert-danger" role="alert"></div>
+                        
+                        <div class="mb-3">
+                            <label asp-for="@generalModel.DisplayName" class="form-label"></label>
+                            <input asp-for="@generalModel.DisplayName" class="form-control" />
+                            <span asp-validation-for="@generalModel.DisplayName" class="text-danger"></span>
+                        </div>
+                        
+                        <div class="mb-3">
+                            <label asp-for="@generalModel.AboutMe" class="form-label"></label>
+                            <textarea asp-for="@generalModel.AboutMe" class="form-control" rows="4"></textarea>
+                            <span asp-validation-for="@generalModel.AboutMe" class="text-danger"></span> @* EKLENDİ *@
+                        </div>
+                        
+                        <div class="mb-3">
+                            <label asp-for="@generalModel.Location" class="form-label"></label>
+                            <input asp-for="@generalModel.Location" class="form-control" />
+                            <span asp-validation-for="@generalModel.Location" class="text-danger"></span> @* EKLENDİ *@
+                        </div>
+                        <button type="submit" class="btn btn-primary">Kaydet</button>
+                    </form>
+                </div>
+
+                <div class="tab-pane fade @(activeTab == "password" ? "show active" : "")" id="password">
+                    <h4>Parola Değiştir</h4>
+                    <hr />
+                    <form asp-controller="Settings" asp-action="ChangePassword" method="post">
+                        <div asp-validation-summary="All" class="alert alert-danger" role="alert"></div>
+
+                        <div class="mb-3">
+                            <label asp-for="@passwordModel.OldPassword" class="form-label"></label>
+                            <input asp-for="@passwordModel.OldPassword" class="form-control" />
+                            <span asp-validation-for="@passwordModel.OldPassword" class="text-danger"></span>
+                        </div>
+                        <div class="mb-3">
+                            <label asp-for="@passwordModel.NewPassword" class="form-label"></label>
+                            <input asp-for="@passwordModel.NewPassword" class="form-control" />
+                            <span asp-validation-for="@passwordModel.NewPassword" class="text-danger"></span>
+                        </div>
+                        <div class="mb-3">
+                            <label asp-for="@passwordModel.ConfirmPassword" class="form-label"></label>
+                            <input asp-for="@passwordModel.ConfirmPassword" class="form-control" />
+                            <span asp-validation-for="@passwordModel.ConfirmPassword" class="text-danger"></span> @* EKLENDİ *@
+                        </div>
+                        <button type="submit" class="btn btn-primary">Parolayı Güncelle</button>
+                    </form>
+                </div>
+
+                <div class="tab-pane fade @(activeTab == "email" ? "show active" : "")" id="email">
+                    <h4>E-posta ve Bildirimler</h4>
+                    <hr />
+                    
+                    <form asp-controller="Settings" asp-action="UpdateEmail" method="post">
+                        @* Burada EmailSettingsViewModel yerine GeneralSettingsViewModel kullanıldığı için hata önlemek adına, 
+                           sadece Email alanını kullanarak POST edeceğiz. *@
+                        <div asp-validation-summary="All" class="text-danger"></div>
+
+                        <div class="mb-3">
+                            <label asp-for="@generalModel.Email" class="form-label"></label>
+                            <input asp-for="@generalModel.Email" class="form-control" />
+                            <span asp-validation-for="@generalModel.Email" class="text-danger"></span> @* EKLENDİ *@
+                        </div>
+
+                        <h5 class="mt-4">Bildirim Tercihleri (Örnek)</h5>
+                        <div class="form-check mb-3">
+                            <input class="form-check-input" type="checkbox" id="notification1">
+                            <label class="form-check-label" for="notification1">Yeni Aktivite Bildirimleri</label>
+                        </div>
+                        <button type="submit" class="btn btn-primary">Kaydet</button>
+                    </form>
+                </div>
+
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+@{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
+@* JavaScript kodunuz aynı kalabilir *@
+<script>
+    document.addEventListener('DOMContentLoaded', function () {
+        // Sayfa yüklendiğinde Bootstrap Tab'ı manuel olarak aktifleştirme
+        var activeTabElement = document.querySelector(`.list-group-item[data-tab-name="@activeTab"]`);
+        if (activeTabElement) {
+            var tab = new bootstrap.Tab(activeTabElement);
+            tab.show();
+        }
+
+        // Sekme linklerine tıklanınca URL'yi değiştiren kod
+        document.querySelectorAll('.list-group-item[data-bs-toggle="tab"]').forEach(item => {
+            item.addEventListener('click', function (e) {
+                const tabName = this.getAttribute('data-tab-name');
+                history.pushState(null, null, `?tab=${tabName}`);
+            });
+        });
+    });
+</script>
+}

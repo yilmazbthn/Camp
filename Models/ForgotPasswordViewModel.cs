@@ -1,6 +1,6 @@
 using System.ComponentModel.DataAnnotations;
 
-namespace TodoMVC.Models;
+namespace KampMVC.Models;
 
 public class ForgotPasswordViewModel
 {

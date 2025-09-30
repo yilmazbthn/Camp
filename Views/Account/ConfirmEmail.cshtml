@@ -1,11 +1,22 @@
+@model bool
 @{
-    ViewData["Title"] = "Email Doğrulama";
+    ViewData["Title"] = Model ? "E-posta Doğrulandı" : "Doğrulama Hatası";
+    Layout = "~/Views/Shared/_AuthLayout.cshtml";
 }
 
-<h2>@ViewData["Title"]</h2>
-
-<div class="alert alert-success mt-3">
-    Tebrikler! Email adresiniz başarıyla doğrulandı. Artık sisteme giriş yapabilirsiniz.
+<div class="text-center">
+    @if (Model)
+    {
+        <i class="fas fa-check-circle fa-3x text-success mb-3"></i>
+        <h4 class="mb-3">E-posta Adresiniz Başarıyla Doğrulandı.</h4>
+        <p class="text-muted">Artık hesabınıza giriş yapabilirsiniz.</p>
+        <a asp-action="Login" class="btn btn-primary mt-4">Giriş Yap</a>
+    }
+    else
+    {
+        <i class="fas fa-times-circle fa-3x text-danger mb-3"></i>
+        <h4 class="mb-3">E-posta Doğrulanamadı.</h4>
+        <p class="text-muted">Doğrulama linki geçersiz veya süresi dolmuş olabilir. Lütfen tekrar deneyin.</p>
+        <a asp-action="Register" class="btn btn-secondary mt-4">Tekrar Kayıt Ol</a>
+    }
 </div>
-
-<a asp-controller="Account" asp-action="Login" class="btn btn-primary mt-3">Giriş Yap</a>

@@ -5,8 +5,9 @@ using FluentEmail.Smtp;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Identity.UI.Services;
 using Microsoft.EntityFrameworkCore;
-using TodoMVC;
-using TodoMVC.Data;
+using KampMVC;
+using KampMVC.Data;
+using KampMVC.Services;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -33,16 +34,16 @@ builder.Services.AddIdentity<IdentityUser, IdentityRole>(options =>
 {
     options.Password.RequiredLength = 1;
     options.Password.RequireNonAlphanumeric = false;
-    options.Password.RequireUppercase = true;
-    options.Password.RequireLowercase = true;
+    options.Password.RequireUppercase = false;
+    options.Password.RequireLowercase = false;
     options.Password.RequiredUniqueChars = 0;
     options.Password.RequireDigit = false;
     
-    options.SignIn.RequireConfirmedEmail = true; 
+    options.SignIn.RequireConfirmedEmail = false; 
 })
 .AddEntityFrameworkStores<AppDbContext>()
 .AddDefaultTokenProviders(); 
-
+builder.Services.AddScoped<IMessageService, MessageService>();
 builder.Services.ConfigureApplicationCookie(options =>
 {
     options.LoginPath = "/Account/Login";

@@ -1,7 +1,7 @@
 using System.ComponentModel;
 using System.ComponentModel.DataAnnotations;
 
-namespace TodoMVC.Models;
+namespace KampMVC.Models;
 
 public class LoginViewModel
 {

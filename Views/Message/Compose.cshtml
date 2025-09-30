@@ -1,0 +1,115 @@
+@model KampMVC.Models.ComposeViewModel
+@{
+    ViewData["Title"] = "Yeni Mesaj Oluştur";
+    Layout = "~/Views/Shared/_PortalLayout.cshtml";
+}
+
+@* Select2 Kütüphanesinin CSS'i burada olmalı (veya _Layout.cshtml içinde) *@
+<link href="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css" rel="stylesheet" />
+
+<div class="container mt-4">
+    <a href="/messages" class="text-primary mb-3 d-inline-block"><i class="fas fa-arrow-left me-2"></i> Mesaj Kutusuna Geri Dön</a>
+    
+    <h2><i class="fas fa-paper-plane me-2"></i> Yeni Mesaj Oluştur</h2>
+    <hr />
+
+    <div class="row">
+        <div class="col-md-8 offset-md-2">
+            
+            <form asp-controller="Message" asp-action="Compose" method="post">
+                @* Güvenlik için token *@
+                @Html.AntiForgeryToken()
+                
+                <div asp-validation-summary="ModelOnly" class="alert alert-danger" role="alert"></div>
+
+                <p class="text-muted small">Alıcıları kullanıcı adlarıyla arayarak veya virgülle (,) ayırarak seçiniz.</p>
+
+                <div class="mb-3">
+                    <label asp-for="Recipients" class="form-label"></label>
+                    
+                    @* Select2 bu SELECT etiketini bir AJAX kutusuna dönüştürecek *@
+                    <select asp-for="Recipients" class="form-control" multiple="multiple" style="width: 100%;">
+                        @if (!string.IsNullOrEmpty(Model.Recipients))
+                        {
+                            // Form POST edildikten sonra (validation hatası varsa) mevcut alıcıları korumak için
+                            foreach (var recipient in Model.Recipients.Split(new[] { ',', ';', ' ' }, StringSplitOptions.RemoveEmptyEntries).Distinct())
+                            {
+                                <option selected="selected" value="@recipient">@recipient</option>
+                            }
+                        }
+                    </select>
+                    <span asp-validation-for="Recipients" class="text-danger"></span>
+                </div>
+
+                <div class="mb-3">
+                    <label asp-for="Subject" class="form-label"></label>
+                    <input asp-for="Subject" class="form-control" />
+                    <span asp-validation-for="Subject" class="text-danger"></span>
+                </div>
+
+                <div class="mb-4">
+                    <label asp-for="Content" class="form-label"></label>
+                    <textarea asp-for="Content" class="form-control" rows="5"></textarea>
+                    <span asp-validation-for="Content" class="text-danger"></span>
+                </div>
+
+                <button type="submit" class="btn btn-success btn-lg"><i class="fas fa-paper-plane me-2"></i> Mesajı Gönder</button>
+            </form>
+
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
+    
+    @* Select2 kütüphanesinin JS dosyası burada olmalı (jQuery'den sonra) *@
+    <script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
+
+    <script>
+        $(document).ready(function() {
+            // Select2'yi AJAX ile yapılandır
+            $('#Recipients').select2({
+                minimumInputLength: 2, 
+                placeholder: 'Alıcı(ları) kullanıcı adıyla arayın',
+                tags: true, // Kullanıcının listede olmayan değerler girmesine izin verir (biz bunu Controller'da kontrol edeceğiz)
+                tokenSeparators: [',', ' '], // Kullanıcı manuel olarak virgül/boşluk ile ayırabilir
+                ajax: {
+                    url: '/messages/search-users', // Adım 41'de oluşturduğumuz API URL'si
+                    dataType: 'json',
+                    delay: 250, 
+                    data: function (params) {
+                        return {
+                            term: params.term 
+                        };
+                    },
+                    processResults: function (data) {
+                        return {
+                            results: data.results
+                        };
+                    },
+                    cache: true
+                },
+                templateResult: formatUserResult,
+                templateSelection: formatUserSelection
+            });
+            
+        });
+
+        // Arama sonuç listesindeki her bir öğeyi formatlama fonksiyonu
+        function formatUserResult(user) {
+            if (user.loading) {
+                return user.text;
+            }
+            // user objesi {id, text, avatar} içerir
+            var markup = $('<span><img src="' + user.avatar + '" style="width: 20px; height: 20px; border-radius: 50%; margin-right: 5px; object-fit: cover;" /> ' + user.text + '</span>');
+            return markup;
+        }
+        
+        // Seçilen öğeyi formatlama fonksiyonu
+        function formatUserSelection(user) {
+             // Seçildikten sonra sadece 'id' yani kullanıcı adını tutuyoruz
+            return user.id || user.text; 
+        }
+    </script>
+}

@@ -1,0 +1,32 @@
+/* Geniş Ekranlar İçin İçeriği Ortala */
+.container-fluid {
+    max-width: 1400px;
+}
+
+/* Tüm Kartlara Yumuşak Gölge ve Yuvarlak Köşe Ekleme */
+.card {
+    border-radius: 12px;
+    border: none;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05); /* Hafif gölge */
+}
+
+/* Paylaşım Kutusu ve Post Kartları için özel stil */
+.activity-post .card-body {
+    padding: 20px;
+}
+
+/* Avatar Stilleri */
+.rounded-circle {
+    object-fit: cover; /* Resmin kırpılmadan oturmasını sağlar */
+}
+
+/* Progress Bar Rengi (Bootstrap'in varsayılan rengi yerine) */
+.progress-bar {
+    background-color: #007bff; /* Mavi tonu */
+}
+
+/* Navigasyon Linklerinin Üzerine Gelince Hafif Parlaklık */
+.navbar-nav .nav-link:hover {
+    color: #ffffff !important;
+    opacity: 0.9;
+}

@@ -1,0 +1,52 @@
+@model KampMVC.Models.ForumListViewModel 
+@{ 
+    ViewData["Title"] = "Topluluk Forumları";
+    Layout = "~/Views/Shared/_PortalLayout.cshtml";
+}
+
+<div class="container mt-4">
+    <h2><i class="fas fa-comments text-primary me-2"></i> Topluluk Tartışmaları</h2>
+    <p class="text-muted">Tüm forumlar, konular ve son gönderiler.</p>
+
+    @if (Model != null && Model.ForumCategories != null)
+    {
+        @foreach (var category in Model.ForumCategories)
+        {
+            <div class="card mb-4 border-0 shadow-sm">
+                <div class="card-header bg-light fw-bold">
+                    @category.CategoryName
+                </div>
+                <ul class="list-group list-group-flush">
+                    @foreach (var forum in category.Forums)
+                    {
+                        <li class="list-group-item d-flex justify-content-between align-items-center forum-list-item">
+                            <div class="me-3">
+                                <a href="/forums/forum/@forum.Slug" class="h6 text-decoration-none text-dark fw-bold">@forum.Title</a>
+                                <p class="text-muted small mb-0">@forum.Description</p>
+                                <span class="badge bg-primary me-2">@forum.TopicCount Konu</span>
+                                <span class="badge bg-secondary">@forum.PostCount Gönderi</span>
+                            </div>
+                            
+                            <div class="text-end small d-none d-md-block" style="min-width: 180px;">
+                                <span class="fw-bold">Son Konu:</span>
+                                @if (forum.LastTopic != null)
+                                {
+                                    <a href="/forums/topic/@forum.LastTopic.Slug" class="d-block text-truncate">@forum.LastTopic.Title</a>
+                                    <small class="text-muted">@forum.LastTopic.TimeAgo</small>
+                                }
+                                else
+                                {
+                                    <small class="text-muted">Henüz konu yok</small>
+                                }
+                            </div>
+                        </li>
+                    }
+                </ul>
+            </div>
+        }
+    }
+    else
+    {
+        <div class="alert alert-warning">Görüntülenecek forum kategorisi bulunamadı.</div>
+    }
+</div>

@@ -1,0 +1,43 @@
+@model KampMVC.Controllers.ForumTopicsViewModel
+@{
+    ViewData["Title"] = Model.Forum.Title;
+    Layout = "~/Views/Shared/_PortalLayout.cshtml";
+}
+
+<div class="container mt-4">
+    <nav aria-label="breadcrumb">
+        <ol class="breadcrumb">
+            <li class="breadcrumb-item"><a href="/forums">Forumlar</a></li>
+            <li class="breadcrumb-item active" aria-current="page">@Model.Forum.Title</li>
+        </ol>
+    </nav>
+    
+    <div class="d-flex justify-content-between align-items-center mb-3">
+        <h2>@Model.Forum.Title</h2>
+        <button class="btn btn-primary"><i class="fas fa-plus me-1"></i> Yeni Konu Aç</button>
+    </div>
+    <p class="text-muted">@Model.Forum.Description</p>
+
+    <div class="card shadow-sm border-0">
+        <ul class="list-group list-group-flush">
+            @foreach (var topic in Model.Topics)
+            {
+                <li class="list-group-item d-flex align-items-center">
+                    <div class="me-auto" style="flex-basis: 70%;">
+                        <a href="/forums/topic/@topic.Slug" class="h6 text-decoration-none text-dark fw-bold">@topic.Title</a>
+                        <small class="d-block text-muted">Başlatan: <a href="/profile/@topic.StartedBy.Username" class="text-decoration-none">@topic.StartedBy.DisplayName</a></small>
+                    </div>
+                    
+                    <div class="text-end small">
+                        <span class="badge bg-info text-dark me-3">@topic.PostCount Cevap</span>
+                        <small class="d-block text-muted">@topic.TimeAgo</small>
+                    </div>
+                </li>
+            }
+            @if (!Model.Topics.Any())
+            {
+                <li class="list-group-item text-center text-muted">Bu forumda henüz bir konu açılmamış.</li>
+            }
+        </ul>
+    </div>
+</div>
